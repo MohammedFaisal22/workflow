@@ -1,0 +1,51 @@
+name: Version Bump
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  bump-version:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Ensure full repo history
+
+      - name: Debug - Check Files in Workspace
+        run: |
+          echo "Current Directory:"
+          pwd
+          echo "Listing Files:"
+          ls -la
+
+      - name: Manually Check for package.json
+        run: |
+          if [ -f package.json ]; then
+            echo "package.json exists!"
+          else
+            echo "package.json is missing!"
+            exit 1
+          fi
+
+      - name: Automated Version Bump
+        id: version-bump
+        uses: 'phips28/gh-action-bump-version@master'
+        env:
+          GITHUB_TOKEN: ${{ secrets.PACKAGES_ACCESS_TOKEN }}
+        with:
+          skip-tag: 'true'
+          commit-message: 'CI: bumps version to {{version}} [skip ci]'
+          package-file: 'package.json'  # Directly specify package.json path
+
+      - name: Push Changes
+        run: |
+          git config --global user.name 'github-actions'
+          git config --global user.email 'github-actions@github.com'
+          git add package.json package-lock.json
+          git commit -m "CI: bumps version [skip ci]" || echo "No changes to commit"
+          git push

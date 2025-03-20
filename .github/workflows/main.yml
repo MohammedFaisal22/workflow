@@ -19,10 +19,10 @@ jobs:
         uses: 'phips28/gh-action-bump-version@master'
         env:
           GITHUB_TOKEN: ${{ secrets.PACKAGES_ACCESS_TOKEN }}
-          PACKAGEJSON_DIR: ${{ github.event.client_payload.domain_service }}
-        with:
-          skip-tag: 'true'
-          commit-message: 'CI: bumps version to {{version}} [skip ci]'
+          PACKAGEJSON_DIR: './'  # Root directory
+       with:
+         skip-tag: 'true'
+         commit-message: 'CI: bumps version to {{version}} [skip ci]'
 
       - name: Push Changes
         run: |
